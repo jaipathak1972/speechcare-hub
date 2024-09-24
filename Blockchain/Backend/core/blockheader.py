@@ -1,7 +1,7 @@
 from Blockchain.Backend.core.util.util import hash256
 
 class BlockHeader:
-    def __init__(self,version,prevBlockHash,MarkleRoot,Timestampm,Bits) -> None:
+    def __init__(self,version,prevBlockHash,MarkleRoot,Timestampm,Bits):
             self.version = version
             self.prevBlockHash = prevBlockHash
             self.MarkleRoot = MarkleRoot

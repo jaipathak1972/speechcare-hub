@@ -4,16 +4,26 @@ sys.path.append('/Users/Dell/OneDrive/Desktop/blockchain/bitcoin')
 from Blockchain.Backend.core.block import Block
 from Blockchain.Backend.core.blockheader import BlockHeader
 from Blockchain.Backend.core.util.util import hash256
+from Blockchain.Backend.core.Database.database import BlockchainDB
 import time
-import json
+
 
 ZERO_HASH = '0' * 64
 VERSION= 1
 
 class Blockchain:
-    def __init__(self) -> None:
-        self.chain = []
+    def __init__(self):
         self.GenesisBlock()
+
+
+
+    def write_on_disk(self, block):
+        blockchaindb = BlockchainDB()
+        blockchaindb.write(block)
+
+    def fetch_last_block(self):
+        blockchaindb = BlockchainDB()
+        return blockchaindb.lastBlock()
 
     def GenesisBlock(self):
         BlockHeight = 0
@@ -27,14 +37,13 @@ class Blockchain:
         bits = "fFFf001f"
         blockheader = BlockHeader(VERSION,PrevBlockHash,merkleRoot,timestamp,bits) 
         blockheader.mine()
-        self.chain.append(Block(BlockHeight,1,blockheader.__dict__,1,transaction).__dict__)
-        print(json.dumps(self.chain, indent=4))
+        self.write_on_disk([Block(BlockHeight,1,blockheader.__dict__,1,transaction).__dict__])
 
     def main(self):
         while True:
-            lastBlock = self.chain[::-1]
-            blockHeight = lastBlock[0]["Height"] + 1
-            preBlockHash = lastBlock[0]['BlockHeader']['blockhash']
+            lastBlock = self.fetch_last_block()
+            blockHeight = lastBlock["Height"] + 1
+            preBlockHash = lastBlock['BlockHeader']['blockhash']
             self.addblock(blockHeight,preBlockHash)
 
 
